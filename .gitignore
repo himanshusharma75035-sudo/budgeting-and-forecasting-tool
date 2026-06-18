@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Databases (local workspace data)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3
+
+# Node / frontend
+node_modules/
+frontend/dist/
+*.local
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Build / dist
+build/
+dist/
+
+# Workflow / agent scratch
+_synthesis_raw.md
+_research_raw.json
+_verdicts_raw.json

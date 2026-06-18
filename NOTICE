@@ -1,0 +1,57 @@
+OpenFP&A — Budgeting & Forecasting Tool
+Copyright (c) 2026 OpenFP&A contributors
+Licensed under the MIT License (see LICENSE).
+
+============================================================================
+Open-source dependency licenses
+============================================================================
+All runtime dependencies are OSI-approved and permissive. License audit
+performed 2026-06-18 against PyPI / npm / project LICENSE files.
+
+Backend (Python)
+  fastapi .............. MIT
+  pydantic ............. MIT
+  pydantic-settings .... MIT
+  sqlalchemy ........... MIT
+  sqlmodel ............. MIT
+  alembic .............. MIT
+  uvicorn .............. BSD-3-Clause
+  python-multipart ..... Apache-2.0
+  pandas ............... BSD-3-Clause
+  numpy ................ BSD-3-Clause
+  scipy ................ BSD-3-Clause
+  scikit-learn ......... BSD-3-Clause
+  python-calamine ...... MIT          (Excel read)
+  openpyxl ............. MIT          (Excel write)
+
+Optional 'forecasting' extra
+  statsforecast ........ Apache-2.0   (autonomous ARIMA/ETS/Theta/CES auto-selection)
+  statsmodels .......... BSD-3-Clause
+  prophet .............. MIT          (>=1.1 backend is BSD-3 Stan/cmdstanpy; no GPL)
+  pmdarima ............. MIT
+
+Frontend (JS/TS)
+  react / react-dom .... MIT
+  vite ................. MIT
+  typescript ........... Apache-2.0
+  recharts ............. MIT
+  @tanstack/react-table  MIT
+  @tanstack/react-query  MIT
+  react-router-dom ..... MIT
+  react-hook-form ...... MIT
+  zod .................. MIT
+
+============================================================================
+Deliberately REJECTED dependencies (license landmines)
+============================================================================
+  ag-grid-enterprise ........... npm license "Commercial" (paid EULA)
+  @mui/x-data-grid-pro/-premium  Commercial
+  npm "xlsx" (SheetJS) ......... npm build frozen at vulnerable 0.18.5
+                                 (CVE-2023-30533); SheetJS Pro is commercial.
+                                 -> We parse all spreadsheets server-side in Python.
+  Highcharts ................... non-OSI for commercial use
+  Firefly III / Maybe / Lago /   comparable PRODUCTS (AGPL/GPL), not dependencies:
+  OpenBB / GnuCash / hledger     learn from them, never incorporate their code.
+
+A CI license gate (pip-licenses + license-checker) fails the build on any
+GPL / AGPL / SSPL / BSL / Commercial dependency.
