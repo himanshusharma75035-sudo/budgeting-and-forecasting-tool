@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability (private)
+    url: https://github.com/himanshusharma75035-sudo/budgeting-and-forecasting-tool/security/advisories/new
+    about: Please report security issues privately via a GitHub Security Advisory — do not open a public issue. See SECURITY.md.
+  - name: 📧 Contact the maintainer
+    url: mailto:Himanshusharma75035@gmail.com
+    about: For questions, support, or anything that isn't a bug or feature request.

@@ -24,6 +24,28 @@ class Settings(BaseSettings):
     # CORS for the Vite dev server
     cors_origins: list[str] = ["http://127.0.0.1:5173", "http://localhost:5173"]
 
+    # --- HTTP hardening (see app/security.py and SECURITY.md) ---
+    # Host header allow-list (anti DNS-rebinding / host-spoofing). "testserver" is the host the
+    # TestClient uses; it is not routable so leaving it in is harmless for a local-first tool.
+    trusted_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
+    # Request body cap — generous enough for CSV/Excel template uploads, but bounds memory use.
+    max_request_bytes: int = 25 * 1024 * 1024  # 25 MiB
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 240
+    # Enable only when the API is served behind HTTPS/TLS (HSTS over plain HTTP is harmful).
+    enable_hsts: bool = False
+    # CSP is tuned so the bundled Swagger UI (/docs) still loads from the jsDelivr CDN while
+    # everything else is locked to 'self'. The SPA is served separately by Vite/its own host.
+    content_security_policy: str = (
+        "default-src 'self'; "
+        "img-src 'self' data: https://fastapi.tiangolo.com; "
+        "script-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "worker-src 'self' blob:; connect-src 'self'; "
+        "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+    )
+    permissions_policy: str = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+
     # Forecasting defaults
     default_forecast_horizon: int = 12
     default_cv_windows: int = 3

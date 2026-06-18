@@ -22,11 +22,36 @@ upload** (wide or long layout).
 
 ## Documentation
 
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — visual tour (Mermaid diagrams): system
+  overview, request security pipeline, data model, forecasting/budgeting/variance flows.
 - **[docs/DESIGN.md](docs/DESIGN.md)** — the implementation-ready build brief (the four
   budgeting algorithms, the forecasting auto-selection pipeline, the *verified* variance
   formulas, the data model, the stack, and the phased plan).
+- **[docs/COMBINATIONS.md](docs/COMBINATIONS.md)** — the full budgeting × forecasting × variance
+  combination space.
 - **[docs/RESEARCH_APPENDIX.md](docs/RESEARCH_APPENDIX.md)** — raw research dossiers, the
   adversarial verification verdicts, and all 169 cited sources.
+- **[SECURITY.md](SECURITY.md)** · **[CONTRIBUTING.md](CONTRIBUTING.md)** ·
+  **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**
+
+## Architecture at a glance
+
+```mermaid
+flowchart TB
+    subgraph Client["Browser — React 19 SPA (Vite)"]
+        UI["Dashboard · Budgets · Forecasts · Variance · Accounts · Import"]
+    end
+    UI -->|"/api/* (proxied)"| MW["FastAPI middleware<br/>(CORS · security headers · trusted host · rate limit · body cap)"]
+    MW --> Routes["API routes"]
+    Routes --> Domain["Domain layer<br/>budgeting · forecasting · variance · ingestion"]
+    Routes --> ORM["SQLModel / SQLAlchemy"]
+    Domain --> ORM
+    ORM -->|parameterized SQL| DB[("SQLite · WAL · FK enforced")]
+```
+
+The full set of diagrams — request security pipeline, ER model, forecasting auto-selection,
+budgeting engines, variance flow, ingestion — lives in
+**[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ## Repository layout
 
@@ -77,6 +102,32 @@ npm run dev
 ```
 
 Dev server at http://127.0.0.1:5173, proxying `/api` to the backend on port 8000.
+
+## Security
+
+This is a **local-first, single-user** tool (binds to localhost; data in a local SQLite file) and
+ships no built-in authentication — do not expose it directly to the internet without an
+authenticating reverse proxy. It does, however, apply defence-in-depth:
+
+- **App layer** ([`backend/app/security.py`](backend/app/security.py)) — OWASP secure headers
+  (CSP, anti-clickjacking, nosniff, referrer/permissions policy, cross-origin isolation, optional
+  HSTS), a host allow-list, strict CORS, a request body-size cap, and per-IP rate limiting. All
+  tunable via `OPENFPA_*` env vars.
+- **Data layer** — parameterized SQLModel/SQLAlchemy queries (no SQL injection), money as integer
+  minor units in `Decimal`, SQLite with foreign keys + WAL.
+- **Supply chain / CI** — CodeQL, Dependabot, secret scanning (gitleaks, blocking), `pip-audit` +
+  `npm audit`, OpenSSF Scorecard, and a license gate that fails on GPL/AGPL/SSPL/BSL/commercial deps.
+
+Found a vulnerability? Please report it **privately** — see **[SECURITY.md](SECURITY.md)**.
+
+## Contributing
+
+Contributions are welcome — see **[CONTRIBUTING.md](CONTRIBUTING.md)** for dev setup, the CI gates
+your PR must pass, coding standards, and the DCO sign-off. Please also follow the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
+- Bugs & features: [open an issue](https://github.com/himanshusharma75035-sudo/budgeting-and-forecasting-tool/issues/new/choose)
+- Maintainer: Himanshu Sharma — <Himanshusharma75035@gmail.com>
 
 ## Status
 

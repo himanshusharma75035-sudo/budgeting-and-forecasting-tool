@@ -20,3 +20,6 @@ for suffix in ("", "-wal", "-shm"):
     if candidate.exists():
         candidate.unlink()
 os.environ.setdefault("OPENFPA_DATABASE_URL", f"sqlite:///{_test_db.as_posix()}")
+# Keep the HTTP rate limiter off by default so the suite is deterministic; the dedicated
+# security tests flip it back on locally via monkeypatch.
+os.environ.setdefault("OPENFPA_RATE_LIMIT_ENABLED", "false")
