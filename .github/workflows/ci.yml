@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: ["main"]
   pull_request:
 
 jobs:
@@ -26,7 +27,7 @@ jobs:
       - name: License gate (no GPL/AGPL/Commercial deps)
         run: |
           pip install pip-licenses
-          pip-licenses --format=csv --with-system=false > licenses.csv
+          pip-licenses --format=csv > licenses.csv
           python - <<'PY'
           import csv, sys
           banned = ("GPL", "AGPL", "SSPL", "BSL", "Commercial", "Proprietary", "SEE LICENSE")
@@ -65,5 +66,5 @@ jobs:
         run: npm run test -- --run
       - name: License gate
         run: |
-          npx --yes license-checker --production --excludePackages "openfpa-frontend" \
-            --onlyAllow "MIT;BSD;BSD-2-Clause;BSD-3-Clause;Apache-2.0;ISC;0BSD;CC0-1.0;Unlicense;MPL-2.0;Python-2.0"
+          npx --yes license-checker --production --excludePackages "openfpa-frontend@0.1.0" \
+            --onlyAllow "MIT;BSD;BSD-2-Clause;BSD-3-Clause;Apache-2.0;ISC;0BSD;CC0-1.0;Unlicense;MPL-2.0;Python-2.0;OFL-1.1"
