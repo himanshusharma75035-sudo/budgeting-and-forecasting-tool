@@ -1,9 +1,9 @@
-import type { TooltipProps } from "recharts";
+import type { TooltipContentProps } from "recharts";
 
 import { fmtCurrency } from "../../lib/format";
 
 /** Themed tooltip; hides transparent helper series (band bases). */
-export function FinanceTooltip({ active, payload, label }: TooltipProps<number, string>) {
+export function FinanceTooltip({ active, payload, label }: Partial<TooltipContentProps<number, string>>) {
   if (!active || !payload || payload.length === 0) return null;
   const rows = payload.filter(
     (p) => p.value != null && p.color !== "transparent" && !String(p.dataKey).startsWith("_"),

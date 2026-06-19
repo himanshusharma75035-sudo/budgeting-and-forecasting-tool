@@ -7,7 +7,7 @@ import {
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
-  type TooltipProps,
+  type TooltipContentProps,
   XAxis,
   YAxis,
 } from "recharts";
@@ -73,7 +73,7 @@ const SHORT: Record<string, string> = {
 };
 const short = (name: string): string => SHORT[name] ?? (name.length > 11 ? `${name.slice(0, 10)}…` : name);
 
-function WaterfallTooltip({ active, payload }: TooltipProps<number, string>) {
+function WaterfallTooltip({ active, payload }: Partial<TooltipContentProps<number, string>>) {
   if (!active || !payload || payload.length === 0) return null;
   const row = payload[0]?.payload as WaterfallRow | undefined;
   if (!row) return null;
