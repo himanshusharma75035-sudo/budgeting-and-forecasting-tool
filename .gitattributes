@@ -1,0 +1,10 @@
+# Normalize line endings so scripts work on every OS.
+* text=auto
+
+# Windows batch files must be CRLF.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Shell scripts must stay LF (they run on macOS/Linux/Git-Bash).
+*.sh    text eol=lf

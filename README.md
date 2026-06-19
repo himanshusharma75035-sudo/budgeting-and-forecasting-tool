@@ -75,6 +75,20 @@ docs/       design brief, research appendix, upload templates
 > On Windows `cmd`/PowerShell, run each command on its own line — don't paste a trailing
 > `# comment`, since `#` is not a comment marker there and gets passed to the program.
 
+### One command — start both servers
+
+Launcher scripts at the repo root install dependencies, seed the demo database, and start the
+backend (`:8000`) and frontend (`:5173`) together:
+
+| OS | First run (setup + start) | Subsequent starts |
+| --- | --- | --- |
+| **Windows** | double-click **`setup_and_start.bat`** | **`start.bat`** |
+| **macOS / Linux** | `./setup.sh` | `./start-bg.sh` (background) |
+
+On macOS/Linux: `./start-bg.sh stop` / `restart` / `status` manage the background servers (logs go
+to `logs/`). Then open <http://127.0.0.1:5173>. To run the services by hand instead, use the steps
+below.
+
 ### Backend
 
 ```

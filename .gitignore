@@ -31,6 +31,9 @@ Thumbs.db
 build/
 dist/
 
+# Runtime logs from the start scripts
+logs/
+
 # Workflow / agent scratch
 _synthesis_raw.md
 _research_raw.json
