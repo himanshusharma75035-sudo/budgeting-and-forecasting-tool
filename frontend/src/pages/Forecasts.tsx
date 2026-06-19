@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { LineChart as LineChartIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { ChartCard } from "../components/ChartCard";
 import { ForecastFanChart } from "../components/charts/ForecastFanChart";
@@ -36,7 +36,7 @@ const MODELS = [
 ];
 
 export default function Forecasts() {
-  const [account, setAccount] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [horizon, setHorizon] = useState(12);
   const [modelOverride, setModelOverride] = useState("auto");
   const [levels, setLevels] = useState<number[]>([80, 95]);
@@ -50,11 +50,9 @@ export default function Forecasts() {
     queryFn: () => apiGet<AccountOut[]>("/accounts"),
   });
 
-  useEffect(() => {
-    if (!account && accountsQ.data && accountsQ.data.length > 0) {
-      setAccount(accountsQ.data[0].account_code);
-    }
-  }, [account, accountsQ.data]);
+  // Default to the first account until the user picks one. Derived during render
+  // (no setState-in-effect) so it stays correct as the accounts list loads.
+  const account = selectedAccount ?? accountsQ.data?.[0]?.account_code ?? "";
 
   const historyQ = useQuery({
     queryKey: ["entries", "ACTUAL", account],
@@ -98,7 +96,7 @@ export default function Forecasts() {
             <div className="w-56">
               <Select
                 value={account}
-                onChange={(e) => setAccount(e.target.value)}
+                onChange={(e) => setSelectedAccount(e.target.value)}
                 aria-label="Account"
               >
                 {(accountsQ.data ?? []).map((a) => (
