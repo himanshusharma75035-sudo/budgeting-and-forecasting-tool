@@ -61,6 +61,39 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** Parse the download filename out of a Content-Disposition header, if present. */
+function filenameFromDisposition(header: string | null): string | null {
+  if (!header) return null;
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(header);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+/** POST JSON and save the binary response as a file download (e.g. an .xlsx export). */
+export async function downloadPost(
+  path: string,
+  body: unknown,
+  fallbackFilename = "download",
+): Promise<void> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, await parseError(res));
+  }
+  const blob = await res.blob();
+  const filename = filenameFromDisposition(res.headers.get("Content-Disposition")) ?? fallbackFilename;
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 export async function uploadFile<T>(
   path: string,
   file: File,

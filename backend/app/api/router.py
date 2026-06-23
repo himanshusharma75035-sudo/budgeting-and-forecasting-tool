@@ -11,6 +11,7 @@ from app.api.routes import (
     entries,
     forecasts,
     periods,
+    reports,
     uploads,
     variance,
 )
@@ -24,3 +25,4 @@ api_router.include_router(budgets.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(variance.router)
 api_router.include_router(drivers.router)
+api_router.include_router(reports.router)

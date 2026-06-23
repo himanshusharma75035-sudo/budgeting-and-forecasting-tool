@@ -1,6 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { GitCompareArrows, type LucideIcon, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  Download,
+  GitCompareArrows,
+  type LucideIcon,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { toast } from "sonner";
 
 import { ChartCard } from "../components/ChartCard";
 import { buildBridgeRows, VarianceWaterfall } from "../components/charts/VarianceWaterfall";
@@ -8,11 +16,12 @@ import { EmptyState } from "../components/EmptyState";
 import { KpiCard } from "../components/KpiCard";
 import { PageHeader } from "../components/PageHeader";
 import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Select } from "../components/ui/select";
 import { Skeleton } from "../components/ui/skeleton";
 import { Table, TBody, TD, TH, THead, TR } from "../components/ui/table";
-import { apiPost } from "../lib/api";
+import { apiPost, downloadPost } from "../lib/api";
 import { fmtCurrency, fmtCurrencyCompact, fmtPctSigned } from "../lib/format";
 import type {
   BridgeOut,
@@ -79,8 +88,25 @@ export default function Variance() {
   const [base, setBase] = useState("ACTUAL");
   const [compare, setCompare] = useState("BUDGET");
   const [colorblind, setColorblind] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const req: VarianceComputeRequest = { base_scenario: base, compare_scenario: compare };
+
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      await downloadPost(
+        "/reports/variance-pack.xlsx",
+        req,
+        `variance-board-pack-${base}-vs-${compare}.xlsx`.toLowerCase(),
+      );
+      toast.success("Board pack downloaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   const rowsQ = useQuery({
     queryKey: ["variance", base, compare],
@@ -138,6 +164,16 @@ export default function Variance() {
                 ))}
               </Select>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              disabled={rows.length === 0 || downloading}
+              title="Download a formatted Excel board pack"
+            >
+              <Download />
+              {downloading ? "Preparing…" : "Board pack"}
+            </Button>
           </div>
         }
       />
