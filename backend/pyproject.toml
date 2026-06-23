@@ -59,7 +59,9 @@ ignore = ["B008", "UP042"]
 "tests/*" = ["E501"]  # long Decimal fixture lines are clearer unwrapped
 
 [tool.mypy]
-python_version = "3.11"
+# Match the CI/runtime interpreter (3.12). Modern dependency stubs (e.g. numpy) use PEP 695
+# `type` statements that mypy only accepts when the target version is >= 3.12.
+python_version = "3.12"
 ignore_missing_imports = true
 plugins = []
 
