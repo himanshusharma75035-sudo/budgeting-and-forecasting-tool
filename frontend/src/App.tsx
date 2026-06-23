@@ -7,6 +7,7 @@ import Accounts from "./pages/Accounts";
 import Budgets from "./pages/Budgets";
 import Dashboard from "./pages/Dashboard";
 import DataImport from "./pages/DataImport";
+import Drivers from "./pages/Drivers";
 import Forecasts from "./pages/Forecasts";
 import Variance from "./pages/Variance";
 
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/import" element={<DataImport />} />
           <Route path="/accounts" element={<Accounts />} />
           <Route path="/budgets" element={<Budgets />} />
+          <Route path="/drivers" element={<Drivers />} />
           <Route path="/forecasts" element={<Forecasts />} />
           <Route path="/variance" element={<Variance />} />
           <Route

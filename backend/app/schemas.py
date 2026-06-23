@@ -16,6 +16,7 @@ from app.domain.enums import (
     AccountType,
     BudgetMethod,
     Cadence,
+    DriverKind,
     Scenario,
     VarianceKind,
     VolumeMode,
@@ -210,6 +211,46 @@ class BridgeOut(BaseModel):
     start: Money
     steps: list[BridgeStepOut]
     end: Money
+
+
+# --- drivers (driver-based modeling) ---------------------------------------
+
+
+class DriverIn(BaseModel):
+    code: str
+    name: str
+    kind: DriverKind
+    formula: str | None = None
+    values: dict[str, Decimal] = Field(default_factory=dict)  # period (YYYY-MM) -> value
+    account_code: str | None = None
+    unit: str | None = None
+
+
+class DriverModelRequest(BaseModel):
+    periods: list[str]
+    drivers: list[DriverIn]
+
+
+class DriverSeriesOut(BaseModel):
+    code: str
+    name: str
+    kind: DriverKind
+    unit: str | None = None
+    account_code: str | None = None
+    points: list[Money]
+
+
+class AccountLineOut(BaseModel):
+    account_code: str
+    points: list[Money]
+    total: Money
+
+
+class DriverEvalResponse(BaseModel):
+    periods: list[str]
+    series: list[DriverSeriesOut]
+    account_lines: list[AccountLineOut]
+    notes: list[str] = Field(default_factory=list)
 
 
 class UploadReport(BaseModel):

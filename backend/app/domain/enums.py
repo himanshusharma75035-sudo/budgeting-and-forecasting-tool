@@ -44,6 +44,11 @@ class BudgetMethod(str, Enum):
     ZERO_BASED = "ZERO_BASED"
 
 
+class DriverKind(str, Enum):
+    INPUT = "INPUT"  # an explicit value per period
+    FORMULA = "FORMULA"  # computed from an expression over other drivers
+
+
 class VolumeMode(str, Enum):
     STATIC = "STATIC"
     FLEXIBLE = "FLEXIBLE"

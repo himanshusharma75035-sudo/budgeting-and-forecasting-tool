@@ -161,3 +161,44 @@ export interface BridgeOut {
   steps: BridgeStepOut[];
   end: number;
 }
+
+// ---- Drivers (driver-based modeling) ----
+
+export type DriverKind = "INPUT" | "FORMULA";
+
+export interface DriverIn {
+  code: string;
+  name: string;
+  kind: DriverKind;
+  formula?: string | null;
+  values?: Record<string, number | string>;
+  account_code?: string | null;
+  unit?: string | null;
+}
+
+export interface DriverModelRequest {
+  periods: string[];
+  drivers: DriverIn[];
+}
+
+export interface DriverSeriesOut {
+  code: string;
+  name: string;
+  kind: DriverKind;
+  unit?: string | null;
+  account_code?: string | null;
+  points: number[];
+}
+
+export interface AccountLineOut {
+  account_code: string;
+  points: number[];
+  total: number;
+}
+
+export interface DriverEvalResponse {
+  periods: string[];
+  series: DriverSeriesOut[];
+  account_lines: AccountLineOut[];
+  notes: string[];
+}
