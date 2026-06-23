@@ -24,6 +24,8 @@ upload** (wide or long layout).
 
 - **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — visual tour (Mermaid diagrams): system
   overview, request security pipeline, data model, forecasting/budgeting/variance flows.
+- **[docs/ROADMAP.md](docs/ROADMAP.md)** — research-backed, OSI-permissive roadmap to industry-grade:
+  competitive feature matrix, a verified component toolbox, and a phased plan (solo → team → enterprise).
 - **[docs/DESIGN.md](docs/DESIGN.md)** — the implementation-ready build brief (the four
   budgeting algorithms, the forecasting auto-selection pipeline, the *verified* variance
   formulas, the data model, the stack, and the phased plan).
