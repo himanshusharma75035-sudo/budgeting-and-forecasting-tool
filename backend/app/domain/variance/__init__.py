@@ -32,6 +32,13 @@ from app.domain.variance.flexible_budget import (
     flexible_budget,
     variance_hierarchy,
 )
+from app.domain.variance.insights import (
+    InsightDriver,
+    VarianceInsight,
+    VarianceItem,
+    build_insights,
+    compose_narrative,
+)
 from app.domain.variance.materiality import MaterialityThreshold, is_material
 from app.domain.variance.sales_variances import (
     MixQtyResult,
@@ -78,4 +85,10 @@ __all__ = [
     "Bridge",
     "build_bridge",
     "price_volume_decomposition",
+    # insights / narrative
+    "VarianceItem",
+    "InsightDriver",
+    "VarianceInsight",
+    "build_insights",
+    "compose_narrative",
 ]

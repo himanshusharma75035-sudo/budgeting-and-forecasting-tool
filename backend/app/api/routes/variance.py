@@ -15,13 +15,25 @@ from app.domain.money import from_minor
 from app.domain.periods import format_period, parse_period
 from app.domain.variance import (
     BridgeStep,
+    InsightDriver,
     MaterialityThreshold,
+    VarianceItem,
     budget_vs_actual,
     build_bridge,
+    build_insights,
+    compose_narrative,
     favorable_variance,
     is_material,
 )
-from app.schemas import BridgeOut, BridgeStepOut, VarianceComputeRequest, VarianceRowOut
+from app.schemas import (
+    BridgeOut,
+    BridgeStepOut,
+    InsightDriverOut,
+    VarianceComputeRequest,
+    VarianceInsightOut,
+    VarianceRowOut,
+)
+from app.services.ai import enrich_narrative
 
 router = APIRouter(tags=["variance"])
 
@@ -144,4 +156,91 @@ def bridge(req: VarianceComputeRequest, session: Session = Depends(get_session))
         start=result.start,
         steps=[BridgeStepOut(label=s.label, delta=s.delta) for s in result.steps],
         end=result.end,
+    )
+
+
+def _inr_compact(value: Decimal) -> str:
+    """Indian-format a Decimal amount for narrative prose, e.g. ₹1.20 Cr / ₹9.50 L / ₹4,200."""
+    n = abs(value)
+    sign = "-" if value < 0 else ""
+    if n >= Decimal("1e7"):
+        return f"{sign}₹{n / Decimal('1e7'):.2f} Cr"
+    if n >= Decimal("1e5"):
+        return f"{sign}₹{n / Decimal('1e5'):.2f} L"
+    return f"{sign}₹{n:,.0f}"
+
+
+def _driver_out(d: InsightDriver) -> InsightDriverOut:
+    return InsightDriverOut(
+        code=d.code,
+        label=d.label,
+        category=d.category,
+        favorable_variance=d.favorable_variance,
+        actual=d.actual,
+        comparison=d.comparison,
+        is_material=d.is_material,
+    )
+
+
+@router.post("/variance/insights", response_model=VarianceInsightOut)
+def insights(req: VarianceComputeRequest, session: Session = Depends(get_session)) -> VarianceInsightOut:
+    """Ranked variance drivers + an auto-generated narrative.
+
+    Deterministic by default (works fully offline); if AI is enabled in settings the prose is
+    polished by Claude, otherwise the deterministic narrative is returned unchanged.
+    """
+    lo, hi = _bounds(req)
+    base = _aggregate(session, req.base_scenario, budget_version_id=req.budget_version_id,
+                      forecast_run_id=req.forecast_run_id, lo=lo, hi=hi)
+    compare = _aggregate(session, req.compare_scenario, budget_version_id=req.budget_version_id,
+                         forecast_run_id=req.forecast_run_id, lo=lo, hi=hi)
+    accts = {a.account_id: a for a in session.exec(select(Account)).all()}
+    threshold = MaterialityThreshold(pct_threshold=req.pct_threshold, abs_threshold=req.abs_threshold)
+
+    # Aggregate per account over the comparison scope (mirrors the bridge), so insights are
+    # period-totals, not one row per (account, period).
+    keys = set(compare) or set(base)
+    actual_by: dict[int, Decimal] = defaultdict(lambda: Decimal("0"))
+    comp_by: dict[int, Decimal] = defaultdict(lambda: Decimal("0"))
+    for key in keys:
+        aid = key[0]
+        actual_by[aid] += base.get(key, Decimal("0"))
+        comp_by[aid] += compare.get(key, Decimal("0"))
+
+    items: list[VarianceItem] = []
+    for aid in set(actual_by) | set(comp_by):
+        acct = accts.get(aid)
+        if acct is None:
+            continue
+        actual = actual_by.get(aid, Decimal("0"))
+        comparison = comp_by.get(aid, Decimal("0"))
+        var = actual - comparison
+        items.append(
+            VarianceItem(
+                code=acct.account_code,
+                label=acct.account_name or acct.account_code,
+                category=acct.account_category,
+                favorable_variance=favorable_variance(acct.account_type, var),
+                actual=actual,
+                comparison=comparison,
+                is_material=is_material(var, comparison, threshold),
+            )
+        )
+
+    insight = build_insights(items)
+    narrative = compose_narrative(insight, _inr_compact)
+    polished = enrich_narrative(
+        narrative, instruction=f"Context: {req.base_scenario.value} vs {req.compare_scenario.value}."
+    )
+    return VarianceInsightOut(
+        net_favorable=insight.net_favorable,
+        status=insight.status.value,
+        favorable_total=insight.favorable_total,
+        unfavorable_total=insight.unfavorable_total,
+        top_favorable=[_driver_out(d) for d in insight.top_favorable],
+        top_unfavorable=[_driver_out(d) for d in insight.top_unfavorable],
+        by_category=[_driver_out(d) for d in insight.by_category],
+        material=[_driver_out(d) for d in insight.material],
+        narrative=polished or narrative,
+        ai_generated=polished is not None,
     )

@@ -46,6 +46,12 @@ class Settings(BaseSettings):
     )
     permissions_policy: str = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
 
+    # --- Optional AI assist (off by default; the tool stays fully offline/self-hostable) ---
+    # Enable with OPENFPA_AI_ENABLED=true and OPENFPA_ANTHROPIC_API_KEY=... plus the [ai] extra.
+    ai_enabled: bool = False
+    anthropic_api_key: str = ""
+    ai_model: str = "claude-opus-4-8"
+
     # Forecasting defaults
     default_forecast_horizon: int = 12
     default_cv_windows: int = 3

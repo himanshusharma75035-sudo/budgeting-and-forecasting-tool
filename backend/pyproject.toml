@@ -41,6 +41,10 @@ dev = [
     "ruff>=0.5",
     "mypy>=1.10",
 ]
+# Optional AI enrichment (MIT-licensed Anthropic SDK). The tool runs fully without it.
+ai = [
+    "anthropic>=0.40",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]

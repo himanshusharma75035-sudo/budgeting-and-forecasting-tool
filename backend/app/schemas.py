@@ -213,6 +213,29 @@ class BridgeOut(BaseModel):
     end: Money
 
 
+class InsightDriverOut(BaseModel):
+    code: str
+    label: str
+    category: str | None = None
+    favorable_variance: Money
+    actual: Money
+    comparison: Money
+    is_material: bool
+
+
+class VarianceInsightOut(BaseModel):
+    net_favorable: Money
+    status: str
+    favorable_total: Money
+    unfavorable_total: Money
+    top_favorable: list[InsightDriverOut]
+    top_unfavorable: list[InsightDriverOut]
+    by_category: list[InsightDriverOut]
+    material: list[InsightDriverOut]
+    narrative: str
+    ai_generated: bool = False
+
+
 # --- drivers (driver-based modeling) ---------------------------------------
 
 

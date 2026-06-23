@@ -162,6 +162,29 @@ export interface BridgeOut {
   end: number;
 }
 
+export interface InsightDriverOut {
+  code: string;
+  label: string;
+  category?: string | null;
+  favorable_variance: number;
+  actual: number;
+  comparison: number;
+  is_material: boolean;
+}
+
+export interface VarianceInsightOut {
+  net_favorable: number;
+  status: string;
+  favorable_total: number;
+  unfavorable_total: number;
+  top_favorable: InsightDriverOut[];
+  top_unfavorable: InsightDriverOut[];
+  by_category: InsightDriverOut[];
+  material: InsightDriverOut[];
+  narrative: string;
+  ai_generated: boolean;
+}
+
 // ---- Drivers (driver-based modeling) ----
 
 export type DriverKind = "INPUT" | "FORMULA";
