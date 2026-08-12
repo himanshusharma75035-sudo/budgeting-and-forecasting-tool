@@ -4,7 +4,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/backend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     labels: ["dependencies", "backend"]
     groups:
@@ -15,7 +15,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     labels: ["dependencies", "frontend"]
     groups:
@@ -30,9 +30,12 @@ updates:
       - dependency-name: "jsdom"
         update-types: ["version-update:semver-major"]
 
-  # Keep GitHub Actions pinned actions up to date (and patch action CVEs)
+  # Keep GitHub Actions up to date (patch action CVEs), batched into one PR.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels: ["dependencies", "ci"]
+    groups:
+      github-actions:
+        patterns: ["*"]
