@@ -26,6 +26,9 @@ updates:
       # Hold TS major bumps until typescript-eslint supports them, then remove this to upgrade.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # jsdom 30+ requires Node >=22, but CI runs on Node 20. Hold jsdom majors until we move to Node 22+.
+      - dependency-name: "jsdom"
+        update-types: ["version-update:semver-major"]
 
   # Keep GitHub Actions pinned actions up to date (and patch action CVEs)
   - package-ecosystem: "github-actions"
